@@ -10,11 +10,12 @@
 #include <map>
 #include <sstream>
 #include <string>
+#include <vector>
 
 #include "../common/word_utils.h"
 
 int main(int argc, char* argv[]) {
-    std::string rutaArchivo = (argc > 1) ? argv[1] : "data/prueba_pequena.txt";
+    std::string rutaArchivo = (argc > 1) ? argv[1] : "../data/prueba_pequena.txt";
 
     std::ifstream entrada(rutaArchivo);
     if (!entrada.is_open()) {
@@ -22,14 +23,23 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
+    // Lectura del archivo a memoria: NO se mide, para que el tiempo medido
+    // corresponda unicamente al procesamiento (separar, normalizar, contar)
+    // y sea comparable con la version paralela, que hace lo mismo.
+    std::vector<std::string> lineas;
+    std::string linea;
+    while (std::getline(entrada, linea)) {
+        lineas.push_back(linea);
+    }
+    entrada.close();
+
     auto inicio = std::chrono::steady_clock::now();
 
     std::map<std::string, int> frecuencia;  // map -> salida ordenada alfabeticamente
-    std::string linea;
     long totalPalabras = 0;
 
-    while (std::getline(entrada, linea)) {
-        std::istringstream streamLinea(linea);
+    for (const auto& l : lineas) {
+        std::istringstream streamLinea(l);
         std::string token;
         while (streamLinea >> token) {
             std::string palabra = normalizeWord(token);
@@ -38,7 +48,6 @@ int main(int argc, char* argv[]) {
             ++totalPalabras;
         }
     }
-    entrada.close();
 
     auto fin = std::chrono::steady_clock::now();
     double segundos = std::chrono::duration<double>(fin - inicio).count();
@@ -51,7 +60,8 @@ int main(int argc, char* argv[]) {
     std::cerr << "\n--- Resumen (secuencial) ---\n";
     std::cerr << "Total de palabras procesadas: " << totalPalabras << "\n";
     std::cerr << "Palabras distintas: " << frecuencia.size() << "\n";
-    std::cerr << "Tiempo de ejecucion: " << segundos << " s\n";
+    std::cerr << "Tiempo de conteo: " << segundos << " s\n";
+    std::cerr << "TIEMPO_SEGUNDOS=" << segundos << "\n";  // linea facil de parsear para benchmarks
 
     return 0;
 }

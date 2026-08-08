@@ -35,7 +35,7 @@ void procesarLineas(const std::vector<std::string>& lineas, size_t desde, size_t
 }
 
 int main(int argc, char* argv[]) {
-    std::string rutaArchivo = (argc > 1) ? argv[1] : "data/prueba_pequena.txt";
+    std::string rutaArchivo = (argc > 1) ? argv[1] : "../data/prueba_pequena.txt";
     unsigned int numHilos = (argc > 2) ? static_cast<unsigned int>(std::stoul(argv[2]))
                                         : std::thread::hardware_concurrency();
     if (numHilos == 0) numHilos = 4;
@@ -100,7 +100,8 @@ int main(int argc, char* argv[]) {
     std::cerr << "Total de palabras procesadas: " << totalPalabras << "\n";
     std::cerr << "Palabras distintas: " << frecuenciaGlobal.size() << "\n";
     std::cerr << "Hilos utilizados: " << numHilos << "\n";
-    std::cerr << "Tiempo de ejecucion: " << segundos << " s\n";
+    std::cerr << "Tiempo de conteo: " << segundos << " s\n";
+    std::cerr << "TIEMPO_SEGUNDOS=" << segundos << "\n";  // linea facil de parsear para benchmarks
 
     return 0;
 }
