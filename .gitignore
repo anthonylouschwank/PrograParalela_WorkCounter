@@ -1,0 +1,4 @@
+*.exe
+*.o
+build/
+data/prueba_grande.txt
